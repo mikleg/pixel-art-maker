@@ -18,7 +18,7 @@
     drawCanvas(20,30, document.getElementById("canvas"));
     drawPalette(allcolors);
     drawCurrentColor();
-
+    setRadioListener();
 
     function getCurrentColor() {
         return currentColor;
@@ -97,4 +97,38 @@
         node.appendChild(textnode);
         return node;
     }
+// Gets the Radio value with given name
+    function getRadioVal(name) {
+        var val;
+        var radios = document.getElementsByName(name);
+        for (var i=0, len=radios.length; i<len; i++) {
+            if ( radios[i].checked ) {
+                val = radios[i].value;
+                break;
+            }
+        }
+        return val;
+    }
+// Sets the border of children elements with given style
+    function setGrid(parentsId, grid) {
+        const crows = document.getElementById(parentsId).childElementCount;
+        const ccol = document.getElementById(parentsId).firstElementChild.childElementCount;
+        for (var i =0; i < crows; i++){
+            for(var j = 0; j < ccol; j++){
+                var node = document.getElementById(parentsId + "_r"+ i +"c" + j);
+                if (grid == "none")
+                    node.style.borderColor = window.getComputedStyle(node).backgroundColor;
+                else
+                    node.style.borderColor = "black";
+            }
+        }
+    }
+//Sets the Radio listener
+    function setRadioListener(){
+        for (var k =0; k < 2; k++){
+            document.getElementsByName("grid")[k].addEventListener("click", function(){
+                     setGrid("canvas", getRadioVal("grid"));
+           });
+        }
 
+    }
