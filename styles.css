@@ -1,7 +1,7 @@
-#canvas {
+/*.canvas {
     font-family: "Courier New", monospace;
     line-height: 1;
-}
+}*/
 .whitePixel {
    /* border-style: hidden;*/
     border-style: solid;
@@ -19,3 +19,6 @@
     display: inline-block;
 
 }
+/*.tools {*/
+    /*display: inline-block;*/
+/*}*/

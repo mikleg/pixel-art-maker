@@ -21,6 +21,7 @@
     drawCurrentColor();
     setRadioListener();
     setMouseUpDownListener();
+    setColorPickerListener();
 
     function getCurrentColor() {
         return currentColor;
@@ -96,7 +97,6 @@
             clickEvent(node);
         });
         node.addEventListener("mouseenter", function(){
-            const debug =1;
             if (isCurrentMouse())
                 clickEvent(node);
         });
@@ -109,7 +109,8 @@
         var node = document.createElement("DIV");
         node.setAttribute("id", id);
         changePoint(color, node, borderColor);
-        const textnode = document.createTextNode(String.fromCharCode(160));
+        const textnode = document.createTextNode(String.fromCharCode(160) + String.fromCharCode(160)
+            + String.fromCharCode(160));
         node.appendChild(textnode);
         return node;
     }
@@ -148,12 +149,19 @@
         }
 
     }
-
+//Sets mousedown and up events listeners
     function setMouseUpDownListener(){
         document.getElementsByTagName("html")[0].addEventListener("mousedown", function(){
             setCurrentMouse(true);
         });
         document.getElementsByTagName("html")[0].addEventListener("mouseup", function(){
             setCurrentMouse(false);
+        });
+    }
+//Sets Color picker listener and changes color current color window
+    function setColorPickerListener() {
+        document.getElementById("picker").addEventListener("change", function(){
+            setCurrentColor(document.getElementById("picker").value);
+            changePoint (currentColor, document.getElementById("currentColor_r0c0"), "black");
         });
     }
