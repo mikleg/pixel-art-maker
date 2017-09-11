@@ -27,6 +27,20 @@
     function setCurrentColor(color) {
         currentColor = color;
     }
+    //draws a canvas with given size and background color
+    function drawCanvas(rows, columns, parent, borderColor)
+    {
+        if (borderColor == undefined)
+            borderColor = "black";
+        for (var i = 0; i < rows; i++) {
+            var row = document.createElement("DIV");
+            for (var j = 0; j < columns; j++){
+                row.appendChild(makePoint("white",parent.getAttribute("id")+"_r"+ i +"c" + j, borderColor));
+            }
+            parent.appendChild(row);
+        }
+    }
+
     //draws current color point
     function drawCurrentColor(){
         drawCanvas(1,1, document.getElementById("currentColor"));
@@ -38,6 +52,10 @@
         drawCanvas(1,colors.length, document.getElementById("palette"));
         for (var i = 0; i < colors.length; i++){
             changePoint (colors[i], document.getElementById("palette_r0c" + i), "black");
+          //  document.getElementById("palette_r0c" + i).style.borderRadius = "23px";
+          //  document.getElementById("palette_r0c" + i).style.marginRight = "15px";
+            document.getElementById("palette_r0c" + i).setAttribute("class", "pElement");
+           // document.getElementById("palette_r0c" + i).style.borderRight = "10px solid"
         }
     }
     //sets a current color if it called from the palette or changes a color of point in other case
@@ -53,19 +71,7 @@
         }
 
     }
-    //draws a canvas with given size and background color
-    function drawCanvas(rows, columns, parent, borderColor)
-    {
-        if (borderColor == undefined)
-            borderColor = "black";
-        for (var i = 0; i < rows; i++) {
-            var row = document.createElement("DIV");
-            for (var j = 0; j < columns; j++){
-                row.appendChild(makePoint("white",parent.getAttribute("id")+"_r"+ i +"c" + j, borderColor));
-            }
-        parent.appendChild(row);
-        }
-    }
+
 
 // changes color and borderColor attributes
     function changePoint (color, node, borderColor){
@@ -75,10 +81,6 @@
         if (borderColor != "black")
             node.style.borderColor = borderColor;
         node.addEventListener("click", function(){
-            //console.log("event " + "row= " + row + " column=" + column);
-            //console.log("border-color= " + window.getComputedStyle(node).backgroundColor);
-           // changePoint (getCurrentColor(), node, window.getComputedStyle(node).backgroundColor);
-           // changePoint ("red", row, column, node, "green");
             clickEvent(node);
         });
         return node;
@@ -89,7 +91,7 @@
         var node = document.createElement("DIV");
         node.setAttribute("id", id);
         changePoint(color, node, borderColor);
-        const textnode = document.createTextNode("T");
+        const textnode = document.createTextNode(String.fromCharCode(160));
         node.appendChild(textnode);
         return node;
     }
