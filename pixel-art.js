@@ -1,4 +1,5 @@
     var currentColor = "red"; //the current color for drawing
+    var currentMouse = false;
     var allcolors = ["AliceBlue","AntiqueWhite","Aqua","Aquamarine","Azure","Beige","Bisque","Black","BlanchedAlmond","Blue" // some colors for palette
         ,"BlueViolet","Brown","BurlyWood","CadetBlue","Chartreuse","Chocolate","Coral","CornflowerBlue","Cornsilk"];
         //,"Crimson"
@@ -19,6 +20,7 @@
     drawPalette(allcolors);
     drawCurrentColor();
     setRadioListener();
+    setMouseUpDownListener();
 
     function getCurrentColor() {
         return currentColor;
@@ -26,6 +28,14 @@
 
     function setCurrentColor(color) {
         currentColor = color;
+    }
+
+    function isCurrentMouse() {
+        return currentMouse;
+    }
+
+    function setCurrentMouse(set) {
+        currentMouse = set;
     }
     //draws a canvas with given size and background color
     function drawCanvas(rows, columns, parent, borderColor)
@@ -75,7 +85,7 @@
     }
 
 
-// changes color and borderColor attributes
+// changes color and borderColor attributes and adds some listeners for every point
     function changePoint (color, node, borderColor){
         node.setAttribute("class", "whitePixel");
         if (color != "white")
@@ -85,6 +95,12 @@
         node.addEventListener("click", function(){
             clickEvent(node);
         });
+        node.addEventListener("mouseenter", function(){
+            const debug =1;
+            if (isCurrentMouse())
+                clickEvent(node);
+        });
+
         return node;
     }
 
@@ -131,4 +147,13 @@
            });
         }
 
+    }
+
+    function setMouseUpDownListener(){
+        document.getElementsByTagName("html")[0].addEventListener("mousedown", function(){
+            setCurrentMouse(true);
+        });
+        document.getElementsByTagName("html")[0].addEventListener("mouseup", function(){
+            setCurrentMouse(false);
+        });
     }
