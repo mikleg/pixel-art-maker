@@ -45,6 +45,8 @@
     function drawCurrentColor(){
         drawCanvas(1,1, document.getElementById("currentColor"));
         changePoint (currentColor, document.getElementById("currentColor_r0c0"), "black");
+        document.getElementById("currentColor_r0c0").textContent = String.fromCharCode(160) + String.fromCharCode(160)
+            + String.fromCharCode(160) + String.fromCharCode(160);
     }
 
     //draws a palette with the given array of colors
@@ -52,10 +54,10 @@
         drawCanvas(1,colors.length, document.getElementById("palette"));
         for (var i = 0; i < colors.length; i++){
             changePoint (colors[i], document.getElementById("palette_r0c" + i), "black");
-          //  document.getElementById("palette_r0c" + i).style.borderRadius = "23px";
-          //  document.getElementById("palette_r0c" + i).style.marginRight = "15px";
             document.getElementById("palette_r0c" + i).setAttribute("class", "pElement");
-           // document.getElementById("palette_r0c" + i).style.borderRight = "10px solid"
+            document.getElementById("palette_r0c" + i).textContent = String.fromCharCode(160) + String.fromCharCode(160)
+            + String.fromCharCode(160) + String.fromCharCode(160);
+
         }
     }
     //sets a current color if it called from the palette or changes a color of point in other case
