@@ -16,12 +16,14 @@
     // ,"PapayaWhip","PeachPuff","Peru","Pink","Plum","PowderBlue","Purple","Red","RosyBrown","RoyalBlue","SaddleBrown","Salmon"
     // ,"SandyBrown","SeaGreen","SeaShell","Sienna","Silver","SkyBlue","SlateBlue","SlateGray","SlateGrey","Snow","SpringGreen"
     // ,"SteelBlue","Tan","Teal","Thistle","Tomato","Turquoise","Violet","Wheat","White","WhiteSmoke","Yellow","YellowGreen"];
+    var saveArray =[];
     drawCanvas(20,30, document.getElementById("canvas"));
     drawPalette(allcolors);
     drawCurrentColor();
     setRadioListener();
     setMouseUpDownListener();
     setColorPickerListener();
+    setSaveListener();
 
     function getCurrentColor() {
         return currentColor;
@@ -163,5 +165,21 @@
         document.getElementById("picker").addEventListener("change", function(){
             setCurrentColor(document.getElementById("picker").value);
             changePoint (currentColor, document.getElementById("currentColor_r0c0"), "black");
+        });
+    }
+
+    function setSaveListener() {
+        document.getElementById("save").addEventListener("click", function(){
+            const crows = document.getElementById("canvas").childElementCount;
+            const ccol = document.getElementById("canvas").firstElementChild.childElementCount;
+            for (var i =0; i < crows; i++){
+                for(var j = 0; j < ccol; j++){
+                    var node = document.getElementById("canvas" + "_r"+ i +"c" + j);
+                        saveArray.push(window.getComputedStyle(node).backgroundColor);
+                }
+            }
+            saveArray.push(crows); saveArray.push(ccol); // save a quantity of rows and columns
+            var debug = JSON.stringify(saveArray);
+            localStorage.setItem("saveArray", debug);
         });
     }
