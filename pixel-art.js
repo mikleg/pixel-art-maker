@@ -24,6 +24,7 @@
     setMouseUpDownListener();
     setColorPickerListener();
     setSaveListener();
+    setLoadListener();
 
     function getCurrentColor() {
         return currentColor;
@@ -167,19 +168,38 @@
             changePoint (currentColor, document.getElementById("currentColor_r0c0"), "black");
         });
     }
-
+ // saves the current pixel art to a local storage after click on the "save" button
     function setSaveListener() {
         document.getElementById("save").addEventListener("click", function(){
             const crows = document.getElementById("canvas").childElementCount;
             const ccol = document.getElementById("canvas").firstElementChild.childElementCount;
+            localStorage.setItem("crows", crows);
+            localStorage.setItem("ccol", ccol);
             for (var i =0; i < crows; i++){
                 for(var j = 0; j < ccol; j++){
                     var node = document.getElementById("canvas" + "_r"+ i +"c" + j);
-                        saveArray.push(window.getComputedStyle(node).backgroundColor);
+                    localStorage.setItem("canvas" + "_r"+ i +"c" + j,  JSON.stringify(window.getComputedStyle(node).backgroundColor));
                 }
             }
-            saveArray.push(crows); saveArray.push(ccol); // save a quantity of rows and columns
-            var debug = JSON.stringify(saveArray);
-            localStorage.setItem("saveArray", debug);
+        });
+    }
+//Deletes a current palette and loads a saved palette after click on the "load" button
+    function setLoadListener() {
+        document.getElementById("load").addEventListener("click", function(){
+            const crows = localStorage.getItem("crows");
+            const ccol = localStorage.getItem("ccol");
+            const parent = document.getElementById("canvas");
+            while (parent.firstChild) {
+                parent.removeChild(parent.firstChild);
+            }
+                const borderColor = "black";
+                for (var i = 0; i < crows; i++) {
+                    var row = document.createElement("DIV");
+                    for (var j = 0; j < ccol; j++){
+                        var name = "canvas"+"_r"+ i +"c" + j;
+                        row.appendChild(makePoint( JSON.parse(localStorage.getItem(name)),name, borderColor));
+                    }
+                    parent.appendChild(row);
+                }
         });
     }
