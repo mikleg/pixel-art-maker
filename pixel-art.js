@@ -1,5 +1,8 @@
     var currentColor = "red"; //the current color for drawing
     var currentMouse = false;
+    var flood = false; // if == true starts FloodFill function in clickEvent
+    var maxRows = 20;
+    var maxCols = 30;
     var allcolors = ["AliceBlue","AntiqueWhite","Aqua","Aquamarine","Azure","Beige","Bisque","Black","BlanchedAlmond","Blue" // some colors for palette
         ,"BlueViolet","Brown","BurlyWood","CadetBlue","Chartreuse","Chocolate","Coral","CornflowerBlue","Cornsilk"];
         //,"Crimson"
@@ -16,7 +19,6 @@
     // ,"PapayaWhip","PeachPuff","Peru","Pink","Plum","PowderBlue","Purple","Red","RosyBrown","RoyalBlue","SaddleBrown","Salmon"
     // ,"SandyBrown","SeaGreen","SeaShell","Sienna","Silver","SkyBlue","SlateBlue","SlateGray","SlateGrey","Snow","SpringGreen"
     // ,"SteelBlue","Tan","Teal","Thistle","Tomato","Turquoise","Violet","Wheat","White","WhiteSmoke","Yellow","YellowGreen"];
-    var saveArray =[];
     drawCanvas(20,30, document.getElementById("canvas"));
     drawPalette(allcolors);
     drawCurrentColor();
@@ -25,10 +27,30 @@
     setColorPickerListener();
     setSaveListener();
     setLoadListener();
+    setFloodFillListener();
+
+    function getMaxCols() {
+        return maxCols;
+    }
+
+
+    function setMaxCols(size) {
+        maxCols = size;
+    }
+
+    function getMaxRows() {
+        return maxRows;
+    }
+
+
+    function setMaxRows(size) {
+        maxRows = size;
+    }
 
     function getCurrentColor() {
         return currentColor;
      }
+
 
     function setCurrentColor(color) {
         currentColor = color;
@@ -40,6 +62,14 @@
 
     function setCurrentMouse(set) {
         currentMouse = set;
+    }
+
+    function setFlood(set) {
+        flood = set;
+    }
+
+    function isFlood() {
+        return flood;
     }
     //draws a canvas with given size and background color
     function drawCanvas(rows, columns, parent, borderColor)
@@ -53,6 +83,34 @@
             }
             parent.appendChild(row);
         }
+    }
+
+    // Makes a point (node) with given id, color and borderColor
+    function makePoint (color, id, borderColor){
+        var node = document.createElement("DIV");
+        node.setAttribute("id", id);
+        changePoint(color, node, borderColor);
+        const textnode = document.createTextNode(String.fromCharCode(160) + String.fromCharCode(160)
+            + String.fromCharCode(160));
+        node.appendChild(textnode);
+        return node;
+    }
+
+    // changes color and borderColor attributes and adds some listeners for every point
+    function changePoint (color, node, borderColor){
+        node.setAttribute("class", "whitePixel");
+        if (color != "white")
+            node.style.background = color;
+        if (borderColor != "black")
+            node.style.borderColor = borderColor;
+        node.addEventListener("click", function(){
+            clickEvent(node);
+        });
+        node.addEventListener("mouseenter", function(){
+            if (isCurrentMouse())
+                clickEvent(node);
+        });
+        return node;
     }
 
     //draws current color point
@@ -74,6 +132,7 @@
 
         }
     }
+
     //sets a current color if it called from the palette or changes a color of point in other case
     function clickEvent(node){
         var parent = node.parentNode;
@@ -83,40 +142,16 @@
             changePoint (getCurrentColor(), document.getElementById("currentColor_r0c0"), "black");
         }
         if (grandParent.getAttribute("id") == "canvas"){
-            changePoint (getCurrentColor(), node, "black");
+            if (isFlood()){
+                floodFill(node, window.getComputedStyle(node).backgroundColor, getCurrentColor());
+                setFlood(false);
+            }
+            else {
+                changePoint (getCurrentColor(), node, "black");
+            }
         }
-
     }
 
-
-// changes color and borderColor attributes and adds some listeners for every point
-    function changePoint (color, node, borderColor){
-        node.setAttribute("class", "whitePixel");
-        if (color != "white")
-            node.style.background = color;
-        if (borderColor != "black")
-            node.style.borderColor = borderColor;
-        node.addEventListener("click", function(){
-            clickEvent(node);
-        });
-        node.addEventListener("mouseenter", function(){
-            if (isCurrentMouse())
-                clickEvent(node);
-        });
-
-        return node;
-    }
-
-// Makes a point (node) with given id, color and borderColor
-    function makePoint (color, id, borderColor){
-        var node = document.createElement("DIV");
-        node.setAttribute("id", id);
-        changePoint(color, node, borderColor);
-        const textnode = document.createTextNode(String.fromCharCode(160) + String.fromCharCode(160)
-            + String.fromCharCode(160));
-        node.appendChild(textnode);
-        return node;
-    }
 // Gets the Radio value with given name
     function getRadioVal(name) {
         var val;
@@ -150,7 +185,6 @@
                      setGrid("canvas", getRadioVal("grid"));
            });
         }
-
     }
 //Sets mousedown and up events listeners
     function setMouseUpDownListener(){
@@ -168,7 +202,7 @@
             changePoint (currentColor, document.getElementById("currentColor_r0c0"), "black");
         });
     }
- // saves the current pixel art to a local storage after click on the "save" button
+ // saves the current pixel art to a local storage after a click on the "save" button
     function setSaveListener() {
         document.getElementById("save").addEventListener("click", function(){
             const crows = document.getElementById("canvas").childElementCount;
@@ -183,7 +217,7 @@
             }
         });
     }
-//Deletes a current palette and loads a saved palette after click on the "load" button
+//Deletes a current canvas and loads a saved canvas after a click on the "load" button
     function setLoadListener() {
         document.getElementById("load").addEventListener("click", function(){
             const crows = localStorage.getItem("crows");
@@ -202,4 +236,40 @@
                     parent.appendChild(row);
                 }
         });
+    }
+
+//sets the flood listener
+    function setFloodFillListener(){
+        document.getElementById("flood").addEventListener("click", function(){
+            setFlood(true);
+        });
+    }
+//performs the "Flood fill"  Stack-based recursive implementation (four-way) algorithm from there "https://en.wikipedia.org/wiki/Flood_fill"
+    function floodFill(node, targetColor, replacementColor){
+        if (targetColor == replacementColor){
+            return;
+        }
+        if (window.getComputedStyle(node).backgroundColor != targetColor ){
+            return;
+        }
+        changePoint (replacementColor, node, window.getComputedStyle(node).borderColor);
+        var row = node.parentNode;
+        var i = 0;
+        while( (node = node.previousSibling) != null )
+            i++;
+        const colindex = i;
+        var  rowindex =0;
+        for (var j=0; (row = row.previousSibling); j++){
+              rowindex = j;}
+
+         if (rowindex < getMaxRows()-1)
+             floodFill(document.getElementById("canvas" + "_r"+ (rowindex + 1)+"c" + colindex), targetColor, replacementColor);
+         if (rowindex > 0)
+             floodFill(document.getElementById("canvas" + "_r"+ (rowindex - 1) +"c" + colindex), targetColor, replacementColor);
+         if (colindex < getMaxCols()-1)
+             floodFill(document.getElementById("canvas" + "_r"+ rowindex +"c" + (colindex + 1)), targetColor, replacementColor);
+        if (colindex > 0)
+            floodFill(document.getElementById("canvas" + "_r"+ rowindex +"c" + (colindex - 1)), targetColor, replacementColor);
+
+        return;
     }
